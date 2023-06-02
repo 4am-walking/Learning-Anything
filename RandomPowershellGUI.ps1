@@ -24,14 +24,16 @@ $sortToolButton.Add_Click(
     # Add more later...
     $extList = @('.png','.jpg')
 
-    $path = Get-ChildItem 'C:\Users\fccbm023\Downloads'
-    $dest = 'C:\Users\fccbm023\Pictures'
+    $path = ("$HOME\Downloads\")
+    $dest = ([Environment]::GetFolderPath('MyPictures') + "\")
+
+    $files = Get-ChildItem -Path $path -File
 
     # Moves every image file to the Pictures folder
-    foreach ($file in $path) {
+    foreach ($file in $files) {
         $ext = [IO.Path]::GetExtension($file)
         if ($ext -in $extList) {
-            Move-Item -Path ('C:\Users\fccbm023\Downloads\'+ $file) -Destination $dest
+            Move-Item -Path ($path + $file) -Destination $dest
         }
     }
 }
@@ -120,8 +122,41 @@ $inputNumBox.Location = New-Object System.Drawing.Point(265,100)
 $inputNumBox.Size = New-Object System.Drawing.Size(100,30)
 $form.Controls.Add($inputNumBox)
 
+# Create the Submit Button
+$createFileButton = New-Object System.Windows.Forms.Button
+$createFileButton.Location = New-Object System.Drawing.Size(375,100)
+$createFileButton.Size = New-Object System.Drawing.Size(90,23)
+$createFileButton.Text = "Generate TXT"
+$form.Controls.Add($createFileButton)
 
+# Create a label telling where the result is stored
+$pathLabel = New-Object System.Windows.Forms.Label
+$pathLabel.Text = ("The result is stored at " + $textLocation)
+$pathLabel.Location = New-Object System.Drawing.Point(10,125)
+$pathLabel.AutoSize = $true
+$pathLabel.Visible = $false
+$form.Controls.Add($pathLabel)
 
+<#
+    This function will create a text file called result.txt and store the multiple of the user input
+#>
+$createFileButton.Add_Click(
+{
+    # Store the user input
+    $inputCharButton = $inputCharBox.Text
+    $inputNumButton = $inputNumBox.Text
+
+    # Set the document path and multiply the user input
+    $textLocation = ([Environment]::GetFolderPath('MyDocuments') + "\result.txt")
+    $resultText = $inputCharButton * $inputNumButton
+
+    # Create the text file and write the result of the multiplication
+    New-Item -Path $textLocation -Force
+    Set-Content -Path $textLocation -Value $resultText
+
+    $pathLabel.Visible = $true
+}
+)
 
 
 # Create a button to exit the GUI
