@@ -1,3 +1,6 @@
+# This script is supposed to scrape the clothing site depop for DC boots that my girlfriend wanted.
+# Created by Chandler Matheny
+
 import requests
 from bs4 import BeautifulSoup
 import winsound
