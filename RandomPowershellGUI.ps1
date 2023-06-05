@@ -97,42 +97,47 @@ $outlookBlockerButton.Add_Click(
 }
 )
 
-# Create Number/Letter Sequence Generator
+<# 
+    Create Number/Letter Sequence Generator
+#>
+
+# Create label for insert character
 $inputChar = New-Object System.Windows.Forms.Label
-$inputChar.Text = "Inset Character:"
-$inputChar.Location = New-Object System.Drawing.Point(10,100)
+$inputChar.Text = "Insert Character:"
+$inputChar.Location = New-Object System.Drawing.Point(10,80)
 $inputChar.AutoSize = $true
 $form.Controls.Add($inputChar)
 
 # Create the user text box
 $inputCharBox = New-Object System.Windows.Forms.TextBox
-$inputCharBox.Location = New-Object System.Drawing.Point(95,100)
+$inputCharBox.Location = New-Object System.Drawing.Point(100,80)
 $inputCharBox.Size = New-Object System.Drawing.Size(30,30)
 $form.Controls.Add($inputCharBox)
 
+# Create the label to repeat
 $inputNum = New-Object System.Windows.Forms.Label
 $inputNum.Text = "Repeat how many times?"
-$inputNum.Location = New-Object System.Drawing.Point(130,100)
+$inputNum.Location = New-Object System.Drawing.Point(130,80)
 $inputNum.AutoSize = $true
 $form.Controls.Add($inputNum)
 
 # Create the user count box
 $inputNumBox = New-Object System.Windows.Forms.TextBox
-$inputNumBox.Location = New-Object System.Drawing.Point(265,100)
+$inputNumBox.Location = New-Object System.Drawing.Point(265,80)
 $inputNumBox.Size = New-Object System.Drawing.Size(100,30)
 $form.Controls.Add($inputNumBox)
 
 # Create the Submit Button
 $createFileButton = New-Object System.Windows.Forms.Button
-$createFileButton.Location = New-Object System.Drawing.Size(375,100)
+$createFileButton.Location = New-Object System.Drawing.Size(375,80)
 $createFileButton.Size = New-Object System.Drawing.Size(90,23)
 $createFileButton.Text = "Generate TXT"
 $form.Controls.Add($createFileButton)
 
 # Create a label telling where the result is stored
 $pathLabel = New-Object System.Windows.Forms.Label
-$pathLabel.Text = ("The result is stored at " + $textLocation)
-$pathLabel.Location = New-Object System.Drawing.Point(10,125)
+$pathLabel.Text = ("The result is stored at " + ([Environment]::GetFolderPath('MyDocuments') + "\result.txt"))
+$pathLabel.Location = New-Object System.Drawing.Point(10,105)
 $pathLabel.AutoSize = $true
 $pathLabel.Visible = $false
 $form.Controls.Add($pathLabel)
@@ -158,6 +163,47 @@ $createFileButton.Add_Click(
 }
 )
 
+<#
+    Create a performance monitor
+#>
+
+# Create performance label
+$performanceLabel = New-Object System.Windows.Forms.Label
+$performanceLabel.Text = "Performance Checker:"
+$performanceLabel.Location = New-Object System.Drawing.Point(10,260)
+$performanceLabel.AutoSize = $true
+$form.Controls.Add($performanceLabel)
+
+# Create performance button
+$performanceButton = New-Object System.Windows.Forms.Button
+$performanceButton.Location = New-Object System.Drawing.Size(127,255)
+$performanceButton.Size = New-Object System.Drawing.Size(115,23)
+$performanceButton.Text = "Check Performance"
+$form.Controls.Add($performanceButton)
+
+# Create the box displaying the performance
+$performanceBox = New-Object System.Windows.Forms.TextBox
+$performanceBox.Multiline = $true
+$performanceBox.ScrollBars = "Vertical"
+$performanceBox.Location = New-Object System.Drawing.Size(10,280)
+$performanceBox.Size = New-Object System.Drawing.Size(400,75)
+$form.Controls.Add($performanceBox)
+
+<#
+    Performance monitor logic
+#>
+$performanceButton.Add_Click(
+{
+    $totalRam = (Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property capacity -Sum).Sum
+            $date = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+            $cpuTime = (Get-Counter '\Processor(_Total)\% Processor Time').CounterSamples.CookedValue
+            $availMem = (Get-Counter '\Memory\Available MBytes').CounterSamples.CookedValue
+            $performance = $date + ' > CPU: ' + $cpuTime.ToString("#,0.000") + '%, Avail. Mem.: ' + $availMem.ToString("N0") + 'MB (' + (104857600 * $availMem / $totalRam).ToString("#,0.0") + "%)"
+            $performanceBox.Text += $performance + "`r`n"
+            $performanceBox.SelectionStart = $performanceBox.TextLength
+            $performanceBox.ScrollToCaret()
+}
+)
 
 # Create a button to exit the GUI
 $exitButton = New-Object System.Windows.Forms.Button
