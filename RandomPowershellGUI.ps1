@@ -21,19 +21,36 @@ $form.Controls.Add($sortToolButton)
 #>
 $sortToolButton.Add_Click(
 {
-    # Add more later...
-    $extList = @('.png','.jpg')
+    # Extension list and folders to store them in
+    $extListVideos = @('.avi', '.flv', '.mov', '.mp4', '.mpeg', '.mpg', '.swf', '.vob', '.wmv')
+    $extListDocuments = @('.accdb', '.accde', '.accdr', '.accdt', '.aspx', '.bat', '.bin', '.cab', '.csv', '.dif', '.doc', '.docm', '.docx', '.dot', '.dotx', '.eml', '.eps', '.exe', '.ini', '.iso', '.jar', '.m4a', '.mdb', '.mid', '.midi', '.msi', '.mui', '.pdf', '.pot', '.potm', '.potx', '.ppam', '.pps', '.ppsm', '.ppsx', '.ppt', '.pptm', '.pptx', '.psd', '.pst', '.pub', '.rar', '.rtf', '.sldm', '.sldx', '.sys', '.tmp', '.txt', '.vsd', '.vsdm', '.vsdx', '.vss', '.vssm', '.vst', '.vstm', '.vstx', '.wbk', '.wks', '.wmd', '.wpd', '.wp5', '.xla', '.xlam', '.xll', '.xlm', '.xls', '.xlsm', '.xlsx', '.xlt', '.xltm', '.xltx', '.xps', '.zip')
+    $extListMusic = @('.aac', '.adt', '.adts', '.aif', '.aifc', '.aiff', '.m4a', '.mid', '.midi', '.mp3')
+    $extListPictures = @('.bmp', '.gif', '.jpg', '.jpeg', '.png', '.tif', '.tiff')
 
     $path = ("$HOME\Downloads\")
-    $dest = ([Environment]::GetFolderPath('MyPictures') + "\")
+
+    # Get the path of the destination directories
+    $pictureDest = ([Environment]::GetFolderPath('MyPictures') + "\")
+    $musicDest = ([Environment]::GetFolderPath('MyMusic') + "\")
+    $documentsDest = ([Environment]::GetFolderPath('MyDocuments') + "\")
+    $videosDest = ([Environment]::GetFolderPath('MyVideos') + "\")
 
     $files = Get-ChildItem -Path $path -File
 
     # Moves every image file to the Pictures folder
     foreach ($file in $files) {
         $ext = [IO.Path]::GetExtension($file)
-        if ($ext -in $extList) {
-            Move-Item -Path ($path + $file) -Destination $dest
+        if ($ext -in $extListVideos) {
+            Move-Item -Path ($path + $file) -Destination $videosDest
+        }
+        if ($ext -in $extListDocuments) {
+            Move-Item -Path ($path + $file) -Destination $documentsDest
+        }
+        if ($ext -in $extListMusic) {
+            Move-Item -Path ($path + $file) -Destination $musicDest
+        }
+        if ($ext -in $extListPictures) {
+            Move-Item -Path ($path + $file) -Destination $pictureDest
         }
     }
 }
@@ -86,13 +103,20 @@ $outlookBlockerScript = {
 #>
 $outlookBlockerButton.Add_Click(
 {
-    if ($outlookBlockerButton.Text -eq "Start Blocker") {
-        $scriptBlockJob = Start-Job -Name "Outlook" -ScriptBlock $outlookBlockerScript
-        $outlookBlockerButton.Text = "Stop Blocker"
-    } else {
-        Stop-Job -Name "Outlook"
-        Remove-Job -Name "Outlook"
-        $outlookBlockerButton.Text = "Start Blocker"
+    try {    
+        if ($outlookBlockerButton.Text -eq "Start Blocker") {
+            $scriptBlockJob = Start-Job -Name "Outlook" -ScriptBlock $outlookBlockerScript
+            $outlookBlockerButton.Text = "Stop Blocker"
+        } else {
+            Stop-Job -Name "Outlook"
+            Remove-Job -Name "Outlook"
+            $outlookBlockerButton.Text = "Start Blocker"
+        }
+    
+    } catch {
+        $logTextBox.ForeColor = 'Red'
+        $logTextBox.Text = ("Unforseen Error. Please try again. " + "`r`nIf the error persists, contact chandler.matheny@gmail.com")
+        $logTextBox.Focus() 
     }
 }
 )
@@ -147,19 +171,27 @@ $form.Controls.Add($pathLabel)
 #>
 $createFileButton.Add_Click(
 {
-    # Store the user input
-    $inputCharButton = $inputCharBox.Text
-    $inputNumButton = $inputNumBox.Text
 
-    # Set the document path and multiply the user input
-    $textLocation = ([Environment]::GetFolderPath('MyDocuments') + "\result.txt")
-    $resultText = $inputCharButton * $inputNumButton
+    try {
+        # Store the user input
+        $inputCharButton = $inputCharBox.Text
+        $inputNumButton = $inputNumBox.Text
 
-    # Create the text file and write the result of the multiplication
-    New-Item -Path $textLocation -Force
-    Set-Content -Path $textLocation -Value $resultText
+        # Set the document path and multiply the user input
+        $textLocation = ([Environment]::GetFolderPath('MyDocuments') + "\result.txt")
+        $resultText = $inputCharButton * $inputNumButton
 
-    $pathLabel.Visible = $true
+        # Create the text file and write the result of the multiplication
+        New-Item -Path $textLocation -Force
+        Set-Content -Path $textLocation -Value $resultText
+
+        $pathLabel.Visible = $true
+
+    } catch {
+        $logTextBox.ForeColor = 'Red'
+        $logTextBox.Text = ("Invalid Input. " + "`r`nIf you're unsure why this error has appeared, contact chandler.matheny@gmail.com")
+        $logTextBox.Focus()
+    }
 }
 )
 
@@ -170,13 +202,13 @@ $createFileButton.Add_Click(
 # Create performance label
 $performanceLabel = New-Object System.Windows.Forms.Label
 $performanceLabel.Text = "Performance Checker:"
-$performanceLabel.Location = New-Object System.Drawing.Point(10,260)
+$performanceLabel.Location = New-Object System.Drawing.Point(10,130)
 $performanceLabel.AutoSize = $true
 $form.Controls.Add($performanceLabel)
 
 # Create performance button
 $performanceButton = New-Object System.Windows.Forms.Button
-$performanceButton.Location = New-Object System.Drawing.Size(127,255)
+$performanceButton.Location = New-Object System.Drawing.Size(127,125)
 $performanceButton.Size = New-Object System.Drawing.Size(115,23)
 $performanceButton.Text = "Check Performance"
 $form.Controls.Add($performanceButton)
@@ -185,7 +217,7 @@ $form.Controls.Add($performanceButton)
 $performanceBox = New-Object System.Windows.Forms.TextBox
 $performanceBox.Multiline = $true
 $performanceBox.ScrollBars = "Vertical"
-$performanceBox.Location = New-Object System.Drawing.Size(10,280)
+$performanceBox.Location = New-Object System.Drawing.Size(10,150)
 $performanceBox.Size = New-Object System.Drawing.Size(400,75)
 $form.Controls.Add($performanceBox)
 
@@ -194,7 +226,8 @@ $form.Controls.Add($performanceBox)
 #>
 $performanceButton.Add_Click(
 {
-    $totalRam = (Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property capacity -Sum).Sum
+    try {
+            $totalRam = (Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property capacity -Sum).Sum
             $date = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
             $cpuTime = (Get-Counter '\Processor(_Total)\% Processor Time').CounterSamples.CookedValue
             $availMem = (Get-Counter '\Memory\Available MBytes').CounterSamples.CookedValue
@@ -202,8 +235,30 @@ $performanceButton.Add_Click(
             $performanceBox.Text += $performance + "`r`n"
             $performanceBox.SelectionStart = $performanceBox.TextLength
             $performanceBox.ScrollToCaret()
+    } catch {
+        $logTextBox.ForeColor = 'Red'
+        $logTextBox.Text = "An error has occured. If you're unsure why this error has happened, please contact chandler.matheny@gmail.com"
+        $logTextBox.Focus()
+    }
 }
 )
+
+<#
+    Create a error console log
+#>
+$logLabel = New-Object System.Windows.Forms.Label
+$logLabel.Text = "Error Log:"
+$logLabel.Location = New-Object System.Drawing.Point(10,260)
+$logLabel.AutoSize = $true
+$form.Controls.Add($logLabel)
+
+$logTextBox = New-Object System.Windows.Forms.TextBox
+$logTextBox.Multiline = $true
+$logTextBox.ScrollBars = "Vertical"
+$logTextBox.Location = New-Object System.Drawing.Size(10,280)
+$logTextBox.Size = New-Object System.Drawing.Size(400,75)
+$form.Controls.Add($logTextBox)
+
 
 # Create a button to exit the GUI
 $exitButton = New-Object System.Windows.Forms.Button
@@ -211,6 +266,8 @@ $exitButton.Location = New-Object System.Drawing.Size(500,325)
 $exitButton.Size = New-Object System.Drawing.Size(60,23)
 $exitButton.Text = "Exit"
 $form.Controls.Add($exitButton)
+
+
 
 <# 
     Exits the form when clicked
