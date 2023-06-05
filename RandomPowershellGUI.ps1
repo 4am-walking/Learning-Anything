@@ -259,6 +259,26 @@ $logTextBox.Location = New-Object System.Drawing.Size(10,280)
 $logTextBox.Size = New-Object System.Drawing.Size(400,75)
 $form.Controls.Add($logTextBox)
 
+<# 
+    Generate System Information in a pop-up
+#>
+$sysInfoButton = New-Object System.Windows.Forms.Button
+$sysInfoButton.Location = New-Object System.Drawing.Size(450,10)
+$sysInfoButton.Size = New-Object System.Drawing.Size(110,23)
+$sysInfoButton.Text = "System Information"
+$form.Controls.Add($sysInfoButton)
+
+$sysInfoButton.Add_Click(
+{
+    $wshell = New-Object -ComObject Wscript.Shell
+    $hostname = hostname
+    $os = Get-CimInstance Win32_OperatingSystem | Select-Object Caption -ExpandProperty Caption
+    $ip = (Test-Connection -ComputerName $hostname -Count 1).IPV4Address.IPAddressToString
+    $wshell.Popup(("Current User: " + $env:UserName + "`r`nComputerName: " + $hostname + "`r`nOperating System: `r`n" + $os + "`r`nIP Address: " + $ip),0,"System Information",0x1) 
+}
+)
+
+
 
 # Create a button to exit the GUI
 $exitButton = New-Object System.Windows.Forms.Button
