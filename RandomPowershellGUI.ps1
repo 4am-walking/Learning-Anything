@@ -9,6 +9,8 @@ $form.Width = 600
 $form.Height = 400
 $form.AutoSize = $true
 $form.BackColor = "42,43,47"
+$form.StartPosition = 'CenterScreen'
+
 
 function createButton {
     param($Var,$locationX,$locationY,$sizeX,$sizeY,[string]$text)
@@ -17,7 +19,22 @@ function createButton {
     $Var.Text = $text
     $Var.BackColor = "Black"
     $Var.ForeColor = "ControlLight"
-    $Var.FlatStyle = "Flat"
+    $Var.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
+    $Var.FlatAppearance.BorderSize = 1
+
+    $Var.Add_MouseEnter({
+        $sender = $this
+        $sender.BackColor = 'Gray'
+    })
+
+    $Var.Add_MouseLeave({
+        $sender = $this
+        if($form.BackColor -eq '42,43,47'){
+            $sender.BackColor = 'Black'
+        } else {
+            $sender.BackColor = 'White'
+        }
+    })
 }
 
 function createLabel {
@@ -37,10 +54,66 @@ function createTextBox {
     $Var.ForeColor = "ControlLight"
 }
 
+function Set-Theme {
+    param($controls)
+    foreach ($control in $controls) {
+        $control.BackColor = $theme.BackgroundColor
+        $control.ForeColor = $theme.ForegroundColor
+
+        if ($control.Controls.Count -gt 0) {
+            Set-Theme $control.Controls
+        }
+    }
+}
+
+$darkTheme = @{
+    BackgroundColor = 'Black'
+    ForegroundColor = 'ControlLight'
+}
+
+$lightTheme = @{
+    BackgroundColor = 'White'
+    ForegroundColor = '42,43,47'
+}
+
+<# -----------------------------------------------------------------------------------------------------------------#>
+# Create the Menu
+$menuStrip = New-Object System.Windows.Forms.MenuStrip
+$menuStrip.BackColor = 'Black'
+
+# Create the Tab
+$settingsMenu = New-Object System.Windows.Forms.ToolStripMenuItem
+$settingsMenu.Text = 'Appearance'
+$settingsMenu.BackColor = 'Gray'
+
+# Create the Tab Items
+$menuItem1 = New-Object System.Windows.Forms.ToolStripMenuItem
+$menuItem1.Text = 'Light Mode'
+$menuItem1.BackColor = 'Gray'
+$menuItem2 = New-Object System.Windows.Forms.ToolStripMenuItem
+$menuItem2.Text = 'Dark Mode'
+$menuItem2.BackColor = 'Gray'
+$settingsMenu.DropDownItems.AddRange(@($menuItem1, $menuItem2))
+$menuStrip.Items.Add($settingsMenu)
+$form.Controls.Add($menuStrip)
+
+
+$menuItem1.Add_Click({
+    $theme = $lightTheme
+    Set-Theme $form.Controls
+    $form.BackColor = 'White'
+})
+
+$menuItem2.Add_Click({
+    $theme = $darkTheme
+    Set-Theme $form.Controls
+    $form.BackColor = '42,43,47'
+})
+
 
 # Create a new button for the Sort Downloads tool
 $sortToolButton = New-Object System.Windows.Forms.Button
-createButton -Var $sortToolButton -locationX 10 -locationY 10 -sizeX 175 -sizeY 23 -text "Sort the Downloads Folder"
+createButton -Var $sortToolButton -locationX 10 -locationY 35 -sizeX 175 -sizeY 23 -text "Sort the Downloads Folder"
 $form.Controls.Add($sortToolButton)
 
 <# 
@@ -85,12 +158,12 @@ $sortToolButton.Add_Click(
 
 # Create a label for the Outlook blocker
 $outlookBlockerLabel = New-Object System.Windows.Forms.Label
-createLabel -Var $outlookBlockerLabel -text "Block Outlook:" -locationX 10 -locationY 50
+createLabel -Var $outlookBlockerLabel -text "Block Outlook:" -locationX 10 -locationY 75
 $form.Controls.Add($outlookBlockerLabel)
 
 # Create a button to start/stop Outlook blocker
 $outlookBlockerButton = New-Object System.Windows.Forms.Button
-createButton -Var $outlookBlockerButton -locationX 90 -locationY 45 -sizeX 80 -sizeY 23 -text "Start Blocker"
+createButton -Var $outlookBlockerButton -locationX 90 -locationY 70 -sizeX 80 -sizeY 23 -text "Start Blocker"
 $form.Controls.Add($outlookBlockerButton)
 
 $outlookBlockerScript = {
@@ -151,32 +224,32 @@ $outlookBlockerButton.Add_Click(
 
 # Create label for insert character
 $inputChar = New-Object System.Windows.Forms.Label
-createLabel -Var $inputChar -text "Insert Character:" -locationX 10 -locationY 80
+createLabel -Var $inputChar -text "Insert Character:" -locationX 10 -locationY 105
 $form.Controls.Add($inputChar)
 
 # Create the user text box
 $inputCharBox = New-Object System.Windows.Forms.TextBox
-createTextBox -Var $inputCharBox -locationX 100 -locationY 80 -sizeX 30 -sizeY 30
+createTextBox -Var $inputCharBox -locationX 100 -locationY 105 -sizeX 30 -sizeY 30
 $form.Controls.Add($inputCharBox)
 
 # Create the label to repeat
 $inputNum = New-Object System.Windows.Forms.Label
-createLabel -Var $inputNum -text "Repeat how many times?" -locationX 130 -locationY 80
+createLabel -Var $inputNum -text "Repeat how many times?" -locationX 130 -locationY 105
 $form.Controls.Add($inputNum)
 
 # Create the user count box
 $inputNumBox = New-Object System.Windows.Forms.TextBox
-createTextBox -Var $inputNumBox -locationX 265 -locationY 80 -sizeX 100 -sizeY 30
+createTextBox -Var $inputNumBox -locationX 265 -locationY 105 -sizeX 100 -sizeY 30
 $form.Controls.Add($inputNumBox)
 
 # Create the Submit Button
 $createFileButton = New-Object System.Windows.Forms.Button
-createButton -Var $createFileButton -locationX 375 -locationY 80 -sizeX 90 -sizeY 23 -text "Generate TXT"
+createButton -Var $createFileButton -locationX 375 -locationY 105 -sizeX 90 -sizeY 23 -text "Generate TXT"
 $form.Controls.Add($createFileButton)
 
 # Create a label telling where the result is stored
 $pathLabel = New-Object System.Windows.Forms.Label
-createLabel -Var $pathLabel -text ("The result is stored at " + ([Environment]::GetFolderPath('MyDocuments') + "\result.txt")) -locationX 10 -locationY 105
+createLabel -Var $pathLabel -text ("The result is stored at " + ([Environment]::GetFolderPath('MyDocuments') + "\result.txt")) -locationX 10 -locationY 130
 $pathLabel.Visible = $false
 $form.Controls.Add($pathLabel)
 
@@ -216,19 +289,20 @@ $createFileButton.Add_Click(
 
 # Create performance label
 $performanceLabel = New-Object System.Windows.Forms.Label
-createLabel -Var $performanceLabel -text "Performance Checker:" -locationX 10 -locationY 130
+createLabel -Var $performanceLabel -text "Performance Checker:" -locationX 10 -locationY 155
 $form.Controls.Add($performanceLabel)
 
 # Create performance button
 $performanceButton = New-Object System.Windows.Forms.Button
-createButton -Var $performanceButton -locationX 127 -locationY 125 -sizeX 115 -sizeY 23 -text "Check Performance"
+createButton -Var $performanceButton -locationX 127 -locationY 150 -sizeX 115 -sizeY 23 -text "Check Performance"
 $form.Controls.Add($performanceButton)
 
 # Create the box displaying the performance
 $performanceBox = New-Object System.Windows.Forms.TextBox
 $performanceBox.Multiline = $true
 $performanceBox.ScrollBars = "Vertical"
-createTextBox -Var $performanceBox -locationX 10 -locationY 150 -sizeX 400 -sizeY 75
+$performanceBox.ReadOnly = $true
+createTextBox -Var $performanceBox -locationX 10 -locationY 175 -sizeX 400 -sizeY 75
 $form.Controls.Add($performanceBox)
 
 <#
@@ -260,10 +334,9 @@ $performanceButton.Add_Click(
 $logLabel = New-Object System.Windows.Forms.Label
 createLabel -Var $logLabel -text "Error Log:" -locationX 10 -locationY 260
 $form.Controls.Add($logLabel)
-
 $logTextBox = New-Object System.Windows.Forms.TextBox
 $logTextBox.Multiline = $true
-$logTextBox.ScrollBars = "Vertical"
+$logTextBox.ReadOnly = $true
 createTextBox -Var $logTextBox -locationX 10 -locationY 280 -sizeX 400 -sizeY 75
 $form.Controls.Add($logTextBox)
 
@@ -271,7 +344,7 @@ $form.Controls.Add($logTextBox)
     Generate System Information in a pop-up
 #>
 $sysInfoButton = New-Object System.Windows.Forms.Button
-createButton -Var $sysInfoButton -locationX 450 -locationY 10 -sizeX 120 -sizeY 23 -text "System Information"
+createButton -Var $sysInfoButton -locationX 450 -locationY 35 -sizeX 120 -sizeY 23 -text "System Information"
 $form.Controls.Add($sysInfoButton)
 
 $sysInfoButton.Add_Click(
@@ -285,13 +358,10 @@ $sysInfoButton.Add_Click(
 )
 
 
-
 # Create a button to exit the GUI
 $exitButton = New-Object System.Windows.Forms.Button
 createButton -Var $exitButton -locationX 500 -locationY 325 -sizeX 60 -sizeY 23 -text "Exit"
 $form.Controls.Add($exitButton)
-
-
 
 <# 
     Exits the form when clicked
