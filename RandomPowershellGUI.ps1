@@ -4,16 +4,43 @@
 # Create form new form and set the length and the width
 Add-Type -assembly System.Windows.Forms
 $form = New-Object System.Windows.Forms.Form
-$form.Text ='Script GUI'
+$form.Text ='PowerShell Tools'
 $form.Width = 600
 $form.Height = 400
 $form.AutoSize = $true
+$form.BackColor = "42,43,47"
 
-# Create a new label for the Sort Downloads tool
+function createButton {
+    param($Var,$locationX,$locationY,$sizeX,$sizeY,[string]$text)
+    $Var.Location = New-Object System.Drawing.Size($locationX,$locationY)
+    $Var.Size = New-Object System.Drawing.Size($sizeX,$sizeY)
+    $Var.Text = $text
+    $Var.BackColor = "Black"
+    $Var.ForeColor = "ControlLight"
+    $Var.FlatStyle = "Flat"
+}
+
+function createLabel {
+    param($Var,[string]$text,$locationX,$locationY)
+    $Var.Text = $text
+    $Var.Location = New-Object System.Drawing.Point($locationX,$locationY)
+    $Var.AutoSize = $true
+    $Var.ForeColor = "ControlLight"
+    $Var.FlatStyle = "Flat"
+}
+
+function createTextBox {
+    param($Var,$locationX,$locationY,$sizeX,$sizeY)
+    $Var.Location = New-Object System.Drawing.Point($locationX,$locationY)
+    $Var.Size = New-Object System.Drawing.Size($sizeX,$sizeY)
+    $Var.BackColor = "Black"
+    $Var.ForeColor = "ControlLight"
+}
+
+
+# Create a new button for the Sort Downloads tool
 $sortToolButton = New-Object System.Windows.Forms.Button
-$sortToolButton.Location = New-Object System.Drawing.Size(10,10)
-$sortToolButton.Size = New-Object System.Drawing.Size(120,23)
-$sortToolButton.Text = "Sort the Downloads Folder"
+createButton -Var $sortToolButton -locationX 10 -locationY 10 -sizeX 175 -sizeY 23 -text "Sort the Downloads Folder"
 $form.Controls.Add($sortToolButton)
 
 <# 
@@ -23,7 +50,7 @@ $sortToolButton.Add_Click(
 {
     # Extension list and folders to store them in
     $extListVideos = @('.avi', '.flv', '.mov', '.mp4', '.mpeg', '.mpg', '.swf', '.vob', '.wmv')
-    $extListDocuments = @('.accdb', '.accde', '.accdr', '.accdt', '.aspx', '.bat', '.bin', '.cab', '.csv', '.dif', '.doc', '.docm', '.docx', '.dot', '.dotx', '.eml', '.eps', '.exe', '.ini', '.iso', '.jar', '.m4a', '.mdb', '.mid', '.midi', '.msi', '.mui', '.pdf', '.pot', '.potm', '.potx', '.ppam', '.pps', '.ppsm', '.ppsx', '.ppt', '.pptm', '.pptx', '.psd', '.pst', '.pub', '.rar', '.rtf', '.sldm', '.sldx', '.sys', '.tmp', '.txt', '.vsd', '.vsdm', '.vsdx', '.vss', '.vssm', '.vst', '.vstm', '.vstx', '.wbk', '.wks', '.wmd', '.wpd', '.wp5', '.xla', '.xlam', '.xll', '.xlm', '.xls', '.xlsm', '.xlsx', '.xlt', '.xltm', '.xltx', '.xps', '.zip')
+    $extListDocuments = @('.accdb', '.accde', '.accdr', '.accdt', '.aspx', '.bat', '.bin', '.cab', '.csv', '.dif', '.doc', '.docm', '.docx', '.dot', '.dotx', '.eml', '.eps', '.exe', '.ini', '.iso', '.jar', '.m4a', '.mdb', '.mid', '.midi', '.msi', '.mui', '.pdf', '.pot', '.potm', '.potx', '.ppam', '.pps', '.ppsm', '.ppsx', '.ppt', '.pptm', '.pptx', '.ps1', '.psd', '.pst', '.pub', '.rar', '.rtf', '.sldm', '.sldx', '.sys', '.tmp', '.txt', '.vsd', '.vsdm', '.vsdx', '.vss', '.vssm', '.vst', '.vstm', '.vstx', '.wbk', '.wks', '.wmd', '.wpd', '.wp5', '.xla', '.xlam', '.xll', '.xlm', '.xls', '.xlsm', '.xlsx', '.xlt', '.xltm', '.xltx', '.xps', '.zip')
     $extListMusic = @('.aac', '.adt', '.adts', '.aif', '.aifc', '.aiff', '.m4a', '.mid', '.midi', '.mp3')
     $extListPictures = @('.bmp', '.gif', '.jpg', '.jpeg', '.png', '.tif', '.tiff')
 
@@ -58,16 +85,12 @@ $sortToolButton.Add_Click(
 
 # Create a label for the Outlook blocker
 $outlookBlockerLabel = New-Object System.Windows.Forms.Label
-$outlookBlockerLabel.Text = "Block Outlook:"
-$outlookBlockerLabel.Location = New-Object System.Drawing.Point(10,50)
-$outlookBlockerLabel.AutoSize = $true
+createLabel -Var $outlookBlockerLabel -text "Block Outlook:" -locationX 10 -locationY 50
 $form.Controls.Add($outlookBlockerLabel)
 
 # Create a button to start/stop Outlook blocker
 $outlookBlockerButton = New-Object System.Windows.Forms.Button
-$outlookBlockerButton.Location = New-Object System.Drawing.Size(90,45)
-$outlookBlockerButton.Size = New-Object System.Drawing.Size(80,23)
-$outlookBlockerButton.Text = "Start Blocker"
+createButton -Var $outlookBlockerButton -locationX 90 -locationY 45 -sizeX 80 -sizeY 23 -text "Start Blocker"
 $form.Controls.Add($outlookBlockerButton)
 
 $outlookBlockerScript = {
@@ -114,6 +137,7 @@ $outlookBlockerButton.Add_Click(
         }
     
     } catch {
+        # Error Message if an error occurs
         $logTextBox.ForeColor = 'Red'
         $logTextBox.Text = ("Unforseen Error. Please try again. " + "`r`nIf the error persists, contact chandler.matheny@gmail.com")
         $logTextBox.Focus() 
@@ -127,42 +151,32 @@ $outlookBlockerButton.Add_Click(
 
 # Create label for insert character
 $inputChar = New-Object System.Windows.Forms.Label
-$inputChar.Text = "Insert Character:"
-$inputChar.Location = New-Object System.Drawing.Point(10,80)
-$inputChar.AutoSize = $true
+createLabel -Var $inputChar -text "Insert Character:" -locationX 10 -locationY 80
 $form.Controls.Add($inputChar)
 
 # Create the user text box
 $inputCharBox = New-Object System.Windows.Forms.TextBox
-$inputCharBox.Location = New-Object System.Drawing.Point(100,80)
-$inputCharBox.Size = New-Object System.Drawing.Size(30,30)
+createTextBox -Var $inputCharBox -locationX 100 -locationY 80 -sizeX 30 -sizeY 30
 $form.Controls.Add($inputCharBox)
 
 # Create the label to repeat
 $inputNum = New-Object System.Windows.Forms.Label
-$inputNum.Text = "Repeat how many times?"
-$inputNum.Location = New-Object System.Drawing.Point(130,80)
-$inputNum.AutoSize = $true
+createLabel -Var $inputNum -text "Repeat how many times?" -locationX 130 -locationY 80
 $form.Controls.Add($inputNum)
 
 # Create the user count box
 $inputNumBox = New-Object System.Windows.Forms.TextBox
-$inputNumBox.Location = New-Object System.Drawing.Point(265,80)
-$inputNumBox.Size = New-Object System.Drawing.Size(100,30)
+createTextBox -Var $inputNumBox -locationX 265 -locationY 80 -sizeX 100 -sizeY 30
 $form.Controls.Add($inputNumBox)
 
 # Create the Submit Button
 $createFileButton = New-Object System.Windows.Forms.Button
-$createFileButton.Location = New-Object System.Drawing.Size(375,80)
-$createFileButton.Size = New-Object System.Drawing.Size(90,23)
-$createFileButton.Text = "Generate TXT"
+createButton -Var $createFileButton -locationX 375 -locationY 80 -sizeX 90 -sizeY 23 -text "Generate TXT"
 $form.Controls.Add($createFileButton)
 
 # Create a label telling where the result is stored
 $pathLabel = New-Object System.Windows.Forms.Label
-$pathLabel.Text = ("The result is stored at " + ([Environment]::GetFolderPath('MyDocuments') + "\result.txt"))
-$pathLabel.Location = New-Object System.Drawing.Point(10,105)
-$pathLabel.AutoSize = $true
+createLabel -Var $pathLabel -text ("The result is stored at " + ([Environment]::GetFolderPath('MyDocuments') + "\result.txt")) -locationX 10 -locationY 105
 $pathLabel.Visible = $false
 $form.Controls.Add($pathLabel)
 
@@ -188,6 +202,7 @@ $createFileButton.Add_Click(
         $pathLabel.Visible = $true
 
     } catch {
+        # Error Message if an error occurs
         $logTextBox.ForeColor = 'Red'
         $logTextBox.Text = ("Invalid Input. " + "`r`nIf you're unsure why this error has appeared, contact chandler.matheny@gmail.com")
         $logTextBox.Focus()
@@ -201,24 +216,19 @@ $createFileButton.Add_Click(
 
 # Create performance label
 $performanceLabel = New-Object System.Windows.Forms.Label
-$performanceLabel.Text = "Performance Checker:"
-$performanceLabel.Location = New-Object System.Drawing.Point(10,130)
-$performanceLabel.AutoSize = $true
+createLabel -Var $performanceLabel -text "Performance Checker:" -locationX 10 -locationY 130
 $form.Controls.Add($performanceLabel)
 
 # Create performance button
 $performanceButton = New-Object System.Windows.Forms.Button
-$performanceButton.Location = New-Object System.Drawing.Size(127,125)
-$performanceButton.Size = New-Object System.Drawing.Size(115,23)
-$performanceButton.Text = "Check Performance"
+createButton -Var $performanceButton -locationX 127 -locationY 125 -sizeX 115 -sizeY 23 -text "Check Performance"
 $form.Controls.Add($performanceButton)
 
 # Create the box displaying the performance
 $performanceBox = New-Object System.Windows.Forms.TextBox
 $performanceBox.Multiline = $true
 $performanceBox.ScrollBars = "Vertical"
-$performanceBox.Location = New-Object System.Drawing.Size(10,150)
-$performanceBox.Size = New-Object System.Drawing.Size(400,75)
+createTextBox -Var $performanceBox -locationX 10 -locationY 150 -sizeX 400 -sizeY 75
 $form.Controls.Add($performanceBox)
 
 <#
@@ -236,6 +246,7 @@ $performanceButton.Add_Click(
             $performanceBox.SelectionStart = $performanceBox.TextLength
             $performanceBox.ScrollToCaret()
     } catch {
+        # Error Message if an error occurs
         $logTextBox.ForeColor = 'Red'
         $logTextBox.Text = "An error has occured. If you're unsure why this error has happened, please contact chandler.matheny@gmail.com"
         $logTextBox.Focus()
@@ -247,25 +258,20 @@ $performanceButton.Add_Click(
     Create a error console log
 #>
 $logLabel = New-Object System.Windows.Forms.Label
-$logLabel.Text = "Error Log:"
-$logLabel.Location = New-Object System.Drawing.Point(10,260)
-$logLabel.AutoSize = $true
+createLabel -Var $logLabel -text "Error Log:" -locationX 10 -locationY 260
 $form.Controls.Add($logLabel)
 
 $logTextBox = New-Object System.Windows.Forms.TextBox
 $logTextBox.Multiline = $true
 $logTextBox.ScrollBars = "Vertical"
-$logTextBox.Location = New-Object System.Drawing.Size(10,280)
-$logTextBox.Size = New-Object System.Drawing.Size(400,75)
+createTextBox -Var $logTextBox -locationX 10 -locationY 280 -sizeX 400 -sizeY 75
 $form.Controls.Add($logTextBox)
 
 <# 
     Generate System Information in a pop-up
 #>
 $sysInfoButton = New-Object System.Windows.Forms.Button
-$sysInfoButton.Location = New-Object System.Drawing.Size(450,10)
-$sysInfoButton.Size = New-Object System.Drawing.Size(110,23)
-$sysInfoButton.Text = "System Information"
+createButton -Var $sysInfoButton -locationX 450 -locationY 10 -sizeX 120 -sizeY 23 -text "System Information"
 $form.Controls.Add($sysInfoButton)
 
 $sysInfoButton.Add_Click(
@@ -282,9 +288,7 @@ $sysInfoButton.Add_Click(
 
 # Create a button to exit the GUI
 $exitButton = New-Object System.Windows.Forms.Button
-$exitButton.Location = New-Object System.Drawing.Size(500,325)
-$exitButton.Size = New-Object System.Drawing.Size(60,23)
-$exitButton.Text = "Exit"
+createButton -Var $exitButton -locationX 500 -locationY 325 -sizeX 60 -sizeY 23 -text "Exit"
 $form.Controls.Add($exitButton)
 
 
